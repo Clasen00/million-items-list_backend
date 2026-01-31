@@ -1,9 +1,12 @@
 import { PAGINATION } from "../config/constants";
 import { PaginatedResponse, PaginationParams } from "../types";
+import { ParsedQs } from "qs";
 
-export const parsePaginationParams = (query: PaginationParams) => {
-  const offset = query.offset || PAGINATION.DEFAULT_OFFSET;
-  const limit = query.limit || PAGINATION.DEFAULT_LIMIT;
+export const parsePaginationParams = (
+  query: ParsedQs | Partial<PaginationParams>,
+): { offset: number; limit: number } => {
+  const offset = Number(query.offset) || PAGINATION.DEFAULT_OFFSET;
+  const limit = Number(query.limit) || PAGINATION.DEFAULT_LIMIT;
 
   return { offset, limit };
 };
