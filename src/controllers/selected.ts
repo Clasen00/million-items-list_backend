@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { selectedService } from "../services/selected";
 import { parsePaginationParams } from "../utils/pagination";
+import { queue } from "../services/queue";
 
 /**
  * Контроллер для работы с выбранными элементами
@@ -22,7 +22,7 @@ class SelectedController {
     try {
       const { offset, limit } = parsePaginationParams(req.query);
 
-      const result = selectedService.getSelected(offset, limit);
+      const result = await queue.getSelectedItems({ offset, limit });
 
       res.json(result);
     } catch (error) {
@@ -45,7 +45,7 @@ class SelectedController {
     try {
       const { ids } = req.body;
 
-      const result = selectedService.addSelected(ids);
+      const result = await queue.addSelectedItems(ids);
 
       res.status(201).json(result);
     } catch (error) {
@@ -68,7 +68,7 @@ class SelectedController {
     try {
       const { ids } = req.body;
 
-      const result = selectedService.updateOrder(ids);
+      const result = await queue.updateItemsOrder(ids);
 
       res.json(result);
     } catch (error) {
@@ -91,7 +91,7 @@ class SelectedController {
     try {
       const { ids } = req.body;
 
-      const result = selectedService.removeSelected(ids);
+      const result = queue.removeSelectedItems(ids);
 
       res.json(result);
     } catch (error) {

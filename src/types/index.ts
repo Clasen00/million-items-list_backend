@@ -84,3 +84,48 @@ export interface GetItemsQuery extends Partial<PaginationParams> {
 export interface SelectedItemsBody {
   ids: number[];
 }
+
+/**
+ * Множественная подписка на очередь
+ */
+export interface QueueSubscriber {
+  resolve: (value: any) => void;
+  reject: (error: any) => void;
+  subscribedAt: number;
+}
+
+/**
+ * Поля для элемента очереди
+ */
+export interface QueueItem {
+  id: string;
+  action:
+    | "GET_ALL"
+    | "GET_SELECTED"
+    | "ADD_ITEM"
+    | "UPDATE_ORDER"
+    | "REMOVE_ITEM";
+  data?: any;
+  timestamp: number; // Время первого добавления
+  subscribers: QueueSubscriber[]; // Массив подписчиков
+  type: "READ" | "WRITE";
+}
+
+/**
+ * Параметры для пакетной операции
+ */
+export interface BatchOperation {
+  type: "READ" | "WRITE";
+  items: QueueItem[];
+  executeTime: number;
+}
+
+/**
+ * Параметры для состояния приложения
+ */
+export interface State {
+  allItems: Map<number, Item>; // Быстрый доступ по ID
+  allItemsArray: Item[]; // Для пагинации
+  selectedItems: number[]; // Порядок важен для сортировки
+  nextId: number;
+}

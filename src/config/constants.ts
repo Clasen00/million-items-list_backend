@@ -6,3 +6,5 @@ export const PAGINATION = {
   MIN_LIMIT: 1,
 };
 export const INITIAL_ITEMS_COUNT = 1000_000;
+export const READ_TIMEOUT = 1000;
+export const WRITE_TIMEOUT = 10000;

@@ -12,6 +12,7 @@ export class DataStore {
     this.initialize();
   }
 
+  // Инициализация 1M элементов
   initialize() {
     this.items = Array.from({ length: INITIAL_ITEMS_COUNT }, (_, i) => ({
       id: i + 1,

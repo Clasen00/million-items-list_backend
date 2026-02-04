@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { itemsService } from "../services/items";
 import { parsePaginationParams } from "../utils/pagination";
+import { queue } from "../services/queue";
 
 /**
  * Контроллер для работы с элементами
@@ -23,7 +23,7 @@ class ItemsController {
       const { offset, limit } = parsePaginationParams(req.query);
       const filter = (req.query.filter as string) || "";
 
-      const result = itemsService.getItems(offset, limit, filter);
+      const result = await queue.getAllItems({ offset, limit, filter });
 
       res.json(result);
     } catch (error) {
