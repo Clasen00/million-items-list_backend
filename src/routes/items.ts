@@ -6,4 +6,6 @@ const router = express.Router();
 // GET /api/items
 router.get("/", itemsController.getItems.bind(itemsController));
 
+router.post("/", itemsController.createItem.bind(itemsController));
+
 export default router;

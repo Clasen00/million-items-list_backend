@@ -21,8 +21,9 @@ class SelectedController {
   ): Promise<void> {
     try {
       const { offset, limit } = parsePaginationParams(req.query);
+      const filter = (req.query.filter as string) || "";
 
-      const result = await queue.getSelectedItems({ offset, limit });
+      const result = await queue.getSelectedItems({ offset, limit, filter });
 
       res.json(result);
     } catch (error) {

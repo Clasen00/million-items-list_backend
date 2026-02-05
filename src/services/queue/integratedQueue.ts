@@ -8,6 +8,8 @@ import {
   AddSelectedResult,
   UpdateOrderResult,
   RemoveSelectedResult,
+  CreateItemBody,
+  CreateItemResult,
 } from "../../types";
 import { RequestQueue } from "./requestQueue";
 
@@ -99,6 +101,10 @@ export class IntegratedQueue extends RequestQueue {
             result = await this.handleRemoveItem(item.data);
             break;
 
+          case "CREATE_ITEM":
+            result = await this.handleCreateItem(item.data);
+            break;
+
           default:
             throw new Error(`Неизвестная WRITE операция: ${item.action}`);
         }
@@ -121,6 +127,28 @@ export class IntegratedQueue extends RequestQueue {
         );
       }
     }
+  }
+
+  /**
+   * Создание нового элемента
+   */
+  private async handleCreateItem(
+    data: CreateItemBody,
+  ): Promise<CreateItemResult> {
+    const { id, name, description, category } = data;
+
+    // Создаем элемент
+    const newItem = this.dataStore.addItem({
+      id,
+      name: name || "",
+      description: description || "",
+      category: category || "",
+    });
+
+    return {
+      message: `Элемент с ID ${newItem.id} успешно создан`,
+      item: newItem,
+    };
   }
 
   /**
@@ -171,26 +199,40 @@ export class IntegratedQueue extends RequestQueue {
   private async handleGetSelected(data?: {
     offset?: number;
     limit?: number;
+    filter?: string;
   }): Promise<SelectedItemsResponse> {
     const offset = data?.offset ?? PAGINATION.DEFAULT_OFFSET;
     const limit = Math.min(
       data?.limit ?? PAGINATION.DEFAULT_LIMIT,
       PAGINATION.MAX_LIMIT,
     );
+    const filter = data?.filter?.toLowerCase() || "";
 
     // Получаем выбранные ID
     const selectedIds = this.dataStore.getSelectedItems();
-    const total = selectedIds.length;
 
-    // Пагинация выбранных ID
-    const paginatedIds = selectedIds.slice(offset, offset + limit);
+    // Получаем данные всех выбранных элементов
+    let allSelectedItems = this.dataStore.getItemsByIds(selectedIds);
 
-    // Получаем данные элементов
-    const items = this.dataStore.getItemsByIds(paginatedIds);
+    // Применяем фильтр если есть
+    if (filter) {
+      allSelectedItems = allSelectedItems.filter(
+        (item) =>
+          item.name.toLowerCase().includes(filter) ||
+          item.description.toLowerCase().includes(filter) ||
+          item.category.toLowerCase().includes(filter) ||
+          item.id.toString().includes(filter), // Фильтр по ID
+      );
+    }
+
+    const total = allSelectedItems.length;
+
+    // Пагинация отфильтрованных элементов
+    const paginatedItems = allSelectedItems.slice(offset, offset + limit);
 
     return {
-      data: items,
-      selectedIds: selectedIds, // Все выбранные ID (не пагинированные)
+      data: paginatedItems,
+      selectedIds: selectedIds, // Все выбранные ID (не отфильтрованные, не пагинированные)
       pagination: {
         offset,
         limit,
@@ -299,6 +341,7 @@ export class IntegratedQueue extends RequestQueue {
   public getSelectedItems(params?: {
     offset?: number;
     limit?: number;
+    filter?: string;
   }): Promise<SelectedItemsResponse> {
     return this.enqueue("GET_SELECTED", params);
   }
@@ -313,5 +356,9 @@ export class IntegratedQueue extends RequestQueue {
 
   public removeSelectedItems(ids: number[]): Promise<RemoveSelectedResult> {
     return this.enqueue("REMOVE_ITEM", { ids });
+  }
+
+  public createItem(data: CreateItemBody): Promise<CreateItemResult> {
+    return this.enqueue("CREATE_ITEM", data);
   }
 }

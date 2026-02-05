@@ -5,10 +5,12 @@ import { INITIAL_ITEMS_COUNT } from "../config/constants";
 export class DataStore {
   private items: Item[];
   private selectedItems: number[];
+  private maxId: number; // Добавляем для отслеживания максимального ID
 
   constructor() {
     this.items = [];
     this.selectedItems = [];
+    this.maxId = 0;
     this.initialize();
   }
 
@@ -74,6 +76,36 @@ export class DataStore {
 
   isItemSelected(id: number) {
     return this.selectedItems.includes(id);
+  }
+
+  /**
+   * Добавление нового элемента
+   * @param item - данные элемента (без ID или с конкретным ID)
+   * @returns созданный элемент
+   */
+  addItem(item: Omit<Item, "id" | "createdAt"> & { id?: number }): Item {
+    // Если ID передан, проверяем уникальность
+    if (item.id !== undefined) {
+      if (this.itemExists(item.id)) {
+        throw new Error(`Элемент с ID ${item.id} уже существует`);
+      }
+      this.maxId = Math.max(this.maxId, item.id);
+    } else {
+      // Генерируем новый ID
+      this.maxId++;
+      item.id = this.maxId;
+    }
+
+    const newItem: Item = {
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      category: item.category,
+      createdAt: new Date().toISOString(),
+    };
+
+    this.items.push(newItem);
+    return newItem;
   }
 }
 

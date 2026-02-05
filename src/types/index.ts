@@ -104,10 +104,11 @@ export interface QueueItem {
     | "GET_SELECTED"
     | "ADD_ITEM"
     | "UPDATE_ORDER"
-    | "REMOVE_ITEM";
+    | "REMOVE_ITEM"
+    | "CREATE_ITEM";
   data?: any;
-  timestamp: number; // Время первого добавления
-  subscribers: QueueSubscriber[]; // Массив подписчиков
+  timestamp: number;
+  subscribers: QueueSubscriber[];
   type: "READ" | "WRITE";
 }
 
@@ -128,4 +129,22 @@ export interface State {
   allItemsArray: Item[]; // Для пагинации
   selectedItems: number[]; // Порядок важен для сортировки
   nextId: number;
+}
+
+/**
+ * Body для создания нового элемента
+ */
+export interface CreateItemBody {
+  id?: number;
+  name?: string;
+  description?: string;
+  category?: string;
+}
+
+/**
+ * Результат создания элемента
+ */
+export interface CreateItemResult {
+  message: string;
+  item: Item;
 }
