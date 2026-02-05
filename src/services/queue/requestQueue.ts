@@ -15,9 +15,15 @@ export class RequestQueue {
     if (data?.ids && Array.isArray(data.ids)) {
       return `${action}_${data.ids.sort().join("_")}`;
     }
-    if (data?.filter !== undefined) {
-      return `${action}_filter_${data.filter}_${data.offset || 0}_${data.limit || 20}`;
+
+    // Для операций с пагинацией (GET_ALL, GET_SELECTED)
+    if (action === "GET_ALL" || action === "GET_SELECTED") {
+      const offset = data?.offset ?? 0;
+      const limit = data?.limit ?? 20;
+      const filter = data?.filter ?? "";
+      return `${action}_${offset}_${limit}_${filter}`;
     }
+
     return `${action}_${JSON.stringify(data)}`;
   }
 
