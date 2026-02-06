@@ -172,10 +172,7 @@ export class IntegratedQueue extends RequestQueue {
     // Применяем фильтр если есть
     if (filter) {
       allItems = allItems.filter(
-        (item) =>
-          item.name.toLowerCase().includes(filter) ||
-          item.description.toLowerCase().includes(filter) ||
-          item.category.toLowerCase().includes(filter),
+        (item) => item.id.toString().startsWith(filter), // Фильтр по ID - начинается с
       );
     }
 
@@ -217,11 +214,7 @@ export class IntegratedQueue extends RequestQueue {
     // Применяем фильтр если есть
     if (filter) {
       allSelectedItems = allSelectedItems.filter(
-        (item) =>
-          item.name.toLowerCase().includes(filter) ||
-          item.description.toLowerCase().includes(filter) ||
-          item.category.toLowerCase().includes(filter) ||
-          item.id.toString().includes(filter), // Фильтр по ID
+        (item) => item.id.toString().startsWith(filter), // Фильтр по ID - начинается с
       );
     }
 
