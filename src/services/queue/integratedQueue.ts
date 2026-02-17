@@ -220,12 +220,10 @@ export class IntegratedQueue extends RequestQueue {
 
     // Получаем данные всех выбранных элементов
     let allSelectedItems = this.dataStore.getItemsByIds(selectedIds);
-      console.log('allSelectedItems1', allSelectedItems);
+
     // Применяем фильтр если есть
     if (filter) {
-      console.log(filter);
       allSelectedItems = this.filterNumbersContaining(allSelectedItems, filter);
-      console.log('allSelectedItems2', allSelectedItems);
     }
 
     const total = allSelectedItems.length;
