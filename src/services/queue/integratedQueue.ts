@@ -152,6 +152,18 @@ export class IntegratedQueue extends RequestQueue {
   }
 
   /**
+   * Возвращает массив чисел из заданного списка, содержащих целевое число в своей десятичной записи.
+   *
+   * @param numbers - Список чисел для поиска.
+   * @param target - Целевое число для поиска в виде подстроки.
+   * @returns Новый массив чисел, содержащих целевое число в своей десятичной записи.
+   */
+  private filterNumbersContaining(numbers: Item[], target: string): Item[] {
+      // Фильтруем список: сохраняя числа, чья строковая представление содержит targetStr
+      return numbers.filter(num => num.id.toString().includes(target));
+  }
+
+  /**
    * Получение всех элементов с пагинацией и фильтрацией
    */
   private async handleGetAll(data?: {
@@ -164,16 +176,14 @@ export class IntegratedQueue extends RequestQueue {
       data?.limit ?? PAGINATION.DEFAULT_LIMIT,
       PAGINATION.MAX_LIMIT,
     );
-    const filter = data?.filter?.toLowerCase() || "";
+    const filter = data?.filter?.toString().toLowerCase() || "";
 
     // Получаем все элементы
     let allItems = this.dataStore.getAllItems();
 
     // Применяем фильтр если есть
     if (filter) {
-      allItems = allItems.filter(
-        (item) => item.id.toString().startsWith(filter), // Фильтр по ID - начинается с
-      );
+      allItems = this.filterNumbersContaining(allItems, filter);
     }
 
     const total = allItems.length;
@@ -203,19 +213,19 @@ export class IntegratedQueue extends RequestQueue {
       data?.limit ?? PAGINATION.DEFAULT_LIMIT,
       PAGINATION.MAX_LIMIT,
     );
-    const filter = data?.filter?.toLowerCase() || "";
+    const filter = data?.filter?.toString().toLowerCase() || "";
 
     // Получаем выбранные ID
     const selectedIds = this.dataStore.getSelectedItems();
 
     // Получаем данные всех выбранных элементов
     let allSelectedItems = this.dataStore.getItemsByIds(selectedIds);
-
+      console.log('allSelectedItems1', allSelectedItems);
     // Применяем фильтр если есть
     if (filter) {
-      allSelectedItems = allSelectedItems.filter(
-        (item) => item.id.toString().startsWith(filter), // Фильтр по ID - начинается с
-      );
+      console.log(filter);
+      allSelectedItems = this.filterNumbersContaining(allSelectedItems, filter);
+      console.log('allSelectedItems2', allSelectedItems);
     }
 
     const total = allSelectedItems.length;
